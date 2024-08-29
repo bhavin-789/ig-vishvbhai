@@ -7,7 +7,7 @@ const userRouter = Router();
 userRouter.post("/signup", userCtrl.signup);
 // userRouter.get("/", auth, userCtrl.getUsers);
 userRouter.get("/profile/:id", auth, userCtrl.getUserProfile);
-// userRouter.delete("/:id", auth, userCtrl.deleteUser);
+userRouter.delete("/:userId", auth, userCtrl.deleteUser);
 userRouter.put(
   "/profile/edit",
   auth,
@@ -22,5 +22,8 @@ userRouter.post("/new-access-token", userCtrl.newAccessToken);
 userRouter.post("/send-email", userCtrl.sendEmail);
 userRouter.post("/verify-otp", userCtrl.verifyOTP);
 userRouter.put("/change-password", userCtrl.changePassword);
+userRouter.get("/:userId/posts", auth, userCtrl.getAllPostByUserId);
+userRouter.get("/restore", userCtrl.restoreUser);
+userRouter.post("/add-country", userCtrl.addCountry);
 
 module.exports = userRouter;

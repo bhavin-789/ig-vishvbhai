@@ -53,6 +53,78 @@ exports.createPost = async (req, res) => {
   }
 };
 
+exports.getSinglePostById = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    if (!postId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Post Id is required." });
+    }
+    const findPost = await db.posts.findOne({
+      where: {
+        id: postId,
+      },
+      attributes: ["id", "caption"],
+      include: [
+        {
+          model: db.postmedias,
+          as: "mediaContent",
+          attributes: ["id", "mediaType", "mediaURL"],
+        },
+      ],
+    });
+
+    if (!findPost) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid Post Id" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Post fetched successfully.",
+      data: findPost,
+    });
+  } catch (error) {
+    console.log("Error while fetching single post", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+exports.getAllPosts = async (req, res) => {
+  try {
+    const fetchdAllPosts = await db.posts.findAll({
+      attributes: ["id", "caption"],
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: db.postmedias,
+          as: "mediaContent",
+          attributes: ["id", "mediaType", "mediaURL", "order"],
+        },
+      ],
+    });
+    if (!fetchdAllPosts.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No Posts found!" });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "All Posts fetched successfully.",
+      data: fetchdAllPosts,
+    });
+  } catch (error) {
+    console.log("Error while fetching all the posts", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 exports.likeAPost = async (req, res) => {
   const postId = req.params.postId;
   const userId = req.user.id;
@@ -201,4 +273,89 @@ exports.deleteAComment = async (req, res) => {
   }
 };
 
-exports.bookmarkThePost = async (req, res) => {};
+exports.bookmarkThePost = async (req, res) => {
+  const { postId } = req.params;
+  const { id: userId } = req.user;
+  try {
+    if (!postId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Post ID is required." });
+    }
+
+    const findBookmarkedPost = await db.bookmarks.findOne({
+      where: { postId, userId },
+    });
+
+    if (findBookmarkedPost) {
+      const removedBookmarkedPost = await findBookmarkedPost.destroy();
+      if (removedBookmarkedPost) {
+        return res.status(200).json({
+          success: true,
+          message: "Post removed from bookmark successfully.",
+        });
+      }
+    } else {
+      const bookmarkedPost = await db.bookmarks.create({ postId, userId });
+      if (bookmarkedPost) {
+        return res
+          .status(200)
+          .json({ success: true, message: "Post bookmarked successfully." });
+      }
+    }
+
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong!" });
+  } catch (error) {
+    console.log("Error while bookmarking the Post.", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+exports.getUsersBookmarkedPost = async (req, res) => {
+  const { id: userId } = req.user;
+  try {
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not authenticated." });
+    }
+    const findBookmakedPost = await db.bookmarks.findAll({
+      where: { userId },
+      attributes: ["id", "userId", "postId"],
+      include: [
+        {
+          model: db.posts,
+          as: "bookmarkedPost",
+          attributes: ["id", "caption"],
+          include: [
+            {
+              model: db.postmedias,
+              as: "mediaContent",
+              attributes: ["id", "mediaURL", "order"],
+            },
+          ],
+        },
+      ],
+    });
+    if (!findBookmakedPost.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User has no bookmarked post yet!" });
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: findBookmakedPost,
+        message: "Fetched bookmarked post successfully.",
+      });
+    }
+  } catch (error) {
+    console.log("Error while fetching bookmarked Posts.", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};

@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Bookmark extends Model {
+  class State extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,22 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-
-      Bookmark.belongsTo(models.users, {
-        foreignKey: "userId",
-        onDelete: "CASCADE",
-      });
-      Bookmark.belongsTo(models.posts, {
-        foreignKey: "postId",
-        onDelete: "CASCADE",
-        as: "bookmarkedPost",
-      });
     }
   }
-  Bookmark.init(
+  State.init(
     {
-      userId: {
-        type: DataTypes.INTEGER,
+      stateName: {
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
@@ -32,23 +22,23 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-      postId: {
+      countryId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
           notNull: {
-            msg: "Post id must be required.",
+            msg: "Country id must be required.",
           },
         },
       },
     },
     {
       sequelize,
-      modelName: "bookmarks",
-      tableName: "bookmarks",
+      modelName: "states",
+      tableName: "states",
       freezeTableName: true,
       timestamps: true,
     }
   );
-  return Bookmark;
+  return State;
 };

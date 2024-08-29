@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class PostMedia extends Model {
+  class Employee extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,68 +9,63 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      PostMedia.belongsTo(models.posts, {
-        foreignKey: "postId",
-        onDelete: "CASCADE",
-        as: "mediaContent",
-      });
     }
   }
-  PostMedia.init(
+  Employee.init(
     {
-      postId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-          notNull: {
-            msg: "Post id must be required.",
-          },
-        },
-      },
-      userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-          notNull: {
-            msg: "User Id must be required.",
-          },
-        },
-      },
-      mediaType: {
+      employeeName: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: "Media Type must be required.",
+            msg: "Employee name must be required.",
           },
         },
       },
-      mediaURL: {
+      cityId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "City id must be required.",
+          },
+        },
+      },
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: "Media URL must be required.",
+            msg: "Email must be required.",
           },
         },
       },
-      order: {
+      gender: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "Gender must be required.",
+          },
+        },
+      },
+      age: {
         type: DataTypes.INTEGER,
-        // allowNull: false,
-        // validate: {
-        // notNull: {
-        // msg: "Order must be required.",
-        // },
-        // },
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "age must be required.",
+          },
+        },
       },
     },
     {
       sequelize,
-      modelName: "postmedias",
-      tableName: "postmedias",
+      modelName: "employees",
+      tableName: "employees",
       freezeTableName: true,
       timestamps: true,
     }
   );
-  return PostMedia;
+  return Employee;
 };

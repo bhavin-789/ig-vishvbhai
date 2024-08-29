@@ -24,6 +24,12 @@ module.exports = (sequelize, DataTypes) => {
       Post.hasMany(models.postmedias, {
         foreignKey: "postId",
         onDelete: "CASCADE",
+        as: "mediaContent",
+      });
+      Post.hasOne(models.bookmarks, {
+        foreignKey: "postId",
+        onDelete: "CASCADE",
+        as: "bookmarkedPost",
       });
     }
   }

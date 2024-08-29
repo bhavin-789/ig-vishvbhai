@@ -15,6 +15,9 @@ postRouter.get("/dislike/:postId", auth, postCtrl.disLikeAPost);
 postRouter.get("/like-dislike/:postId", auth, postCtrl.likeOrDislike);
 postRouter.post("/add-comment/:postId", auth, postCtrl.addAComment);
 postRouter.delete("/delete-comment/:commentId", auth, postCtrl.deleteAComment);
-postRouter.get("/bookmark-post/:postId", auth, postCtrl.bookmarkThePost);
+postRouter.post("/bookmark-post/:postId", auth, postCtrl.bookmarkThePost);
+postRouter.get("/bookmark-post", auth, postCtrl.getUsersBookmarkedPost);
+postRouter.get("/:postId", auth, postCtrl.getSinglePostById);
+postRouter.get("/", auth, postCtrl.getAllPosts);
 
 module.exports = postRouter;
